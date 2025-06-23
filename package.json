@@ -1,0 +1,23 @@
+{
+  "name": "mmm-gaslevel",
+  "version": "1.0.0",
+  "description": "Display gas level in propane tank.",
+  "main": "MMM-GasLevel.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pwandrag/MMM-GasLevel.git"
+  },
+  "keywords": [],
+  "author": "pwandrag",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pwandrag/MMM-GasLevel/issues"
+  },
+  "homepage": "https://github.com/pwandrag/MMM-GasLevel#readme",
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.7.2"
+  }
+}

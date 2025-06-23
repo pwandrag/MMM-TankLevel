@@ -1,0 +1,106 @@
+/*
+ *
+ * MMM-SolarMan
+ *
+ * Author: pwandrag
+ * MIT Licensed.
+ *
+ */
+  :root {
+			--fill-level: 50%;
+			--fill-level-surge: 40%
+		}
+ 
+  .tank {
+    width: 100px;
+    height: 200px;
+    border: 5px solid #555;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    background-color: #ccc;
+  }
+		
+  .tank-top {
+    width: 50px;
+    height: 30px;
+    border: 5px solid #555;
+    border-radius: 5px;
+    position: relative;
+    overflow: hidden;
+    background-color: #757171;
+    margin-left:25px;
+    margin-bottom:-3px;
+    font-size: 24px;
+    font-family: monospace;
+    text-align: center;
+    color: wheat;
+    }
+		
+  .tank-bottom {
+    width: 100px;
+    height: 15px;
+    border: 5px solid #555;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    background-color: #757171;
+    margin-top:-3px;
+    }
+		
+		
+  .tank-container{
+    height:220px;
+    width:100px
+  }
+
+  .gas {
+      width: 100%;
+      height: var(--fill-level); /* 75% filled */
+      background-color: rgba(0, 255, 0, 0.7); /* Green gas */
+      position: absolute;
+      bottom: 0;
+      animation: rise 10s infinite;
+  }
+
+  .gas-level{
+    margin-left:5px;
+    margin-top:5px;
+    font-family:monospace;
+    font-size:20px;
+  }
+ 
+  .bubble {
+      position: relative;
+      background-color: white;
+      border-radius: 50%;
+      opacity: 0.7;
+      animation: float 3s infinite;
+  }
+ 
+  @keyframes float {
+      0% {
+          transform: translateY(0%);
+          opacity: 0.7;
+      }
+      50% {
+          transform: translateY(-100%);
+          opacity: 0;
+      }
+      100% {
+          transform: translateY(0%);
+          opacity: 0.7;
+      }
+  }
+
+  @keyframes rise {
+      0% {
+          height: var(--fill-level);
+      }
+      50% {
+          height: var(--fill-level-surge);
+      }
+      100% {
+          height: var(--fill-level);
+      }
+  }
