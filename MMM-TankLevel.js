@@ -1,5 +1,5 @@
 /* Magic Mirror
- * Module: MMM-GasLevel
+ * Module: MMM-TankLevel
  * Displays propane tank level using burn rate and tank size.
  *
  * Author: pwandrag
@@ -39,7 +39,7 @@ Module.register("MMM-TankLevel",{
 	  refresh = (this.config.updateIntervalSeconds) * 1000;
 	  this.sendSocketNotification("START_TANKLEVEL", {
 		updateInterval: refresh,
-		token: this.config.burnRate,
+		burnRate: this.config.burnRate,
 		fillDate: this.config.fillDate,
 	  });
 	},
@@ -50,28 +50,29 @@ Module.register("MMM-TankLevel",{
 	  if (notification == "ERROR") {
 		msgStats.innerHTML=payload.error;
 		return;
-	  } else if (notification == "GASLEVEL_REFRESH") {
+	  } else if (notification == "TANKLEVEL_REFRESH") {
 		// Update the gas level in the module
 		this.payload = payload;
 	  
-		let gasLevel = payload.gasLevel; // Get the gas level from the payload
+		let TankLevel = payload.TankLevel; // Get the gas level from the payload
 		let daysRemaining = payload.daysRemaining;
+		let TankLevelSurge = TankLevel-10;
 
-		let gasLevelSurge = gasLevel-10;
-		let gasLevelText = this.getDom().querySelector(".gas-level");
-		if (gasLevelText) {
-		  gasLevelText.innerHTML = gasLevel.toFixed(0) + "%"; // Update the text with the gas level
-	  	}
+		let container = document.getElementById("TankLevelContainer")
 
-		let gasLevelElement = this.getDom().querySelector(".gas");
-		gasLevelElement.style.height = `${gasLevel}%`;
+		let levelStyle = container.querySelector(".tank-container");
+		levelStyle.style.setProperty("--fill-level",`${TankLevel}%`);
+		levelStyle.style.setProperty("--fill-level-surge",`${TankLevelSurge}%`);
 
-		let gasTop = this.getDom().querySelector(".tank-top");
+		let TankLevelText = container.querySelector(".gas-level");
+		TankLevelText.innerHTML = TankLevel.toFixed(0) + "%"; // Update the text with the gas level
+
+		let TankLevelElement = container.querySelector(".gas");
+		TankLevelElement.style.height = `${TankLevel}%`;
+
+		let gasTop = container.querySelector(".tank-top");
 		gasTop.innerHTML = `${daysRemaining}d`;
 
-		let root = document.documentElement;
-		root.style.setProperty("--fill-level",`${gasLevel}%`);
-		root.style.setProperty("--fill-level-surge",`${gasLevelSurge}%`);
 		}
 		return;
 	},
@@ -82,11 +83,13 @@ Module.register("MMM-TankLevel",{
 		// Build the table
 		let container = document.createElement("div");
 
-		container.className = "gaslevelContainer";
+		container.id = "TankLevelContainer";
+		container.className = "TankLevelContainer";
 		container.style.width = this.config.width + "px";
 		container.style.height = this.config.height + "px";
 
 		let headerDiv = document.createElement("div");
+		headerDiv.className = "module-header";
 		let headerText = document.createElement("p");
 		headerText.innerHTML = "Gas Level";
 		headerText.style = "margin: 0px 0px 0px 15px;";
@@ -105,14 +108,14 @@ Module.register("MMM-TankLevel",{
 		tankContainer.className = "tank-container";
 
 		let tankTop = document.createElement("div");
-		tankContainer.className = "tank-top";
+		tankTop.className = "tank-top";
 
 		let tankBody = document.createElement("div");
-		tankContainer.className = "tank";
-		let gasLevel = document.createElement("div");
-		gasLevel.className = "gas";
-		let gasLevelText = document.createElement("span");
-		gasLevelText.className = "gas-level";
+		tankBody.className = "tank";
+		let TankLevel = document.createElement("div");
+		TankLevel.className = "gas";
+		let TankLevelText = document.createElement("span");
+		TankLevelText.className = "gas-level";
 
 		let bubble1 = document.createElement("div");
 		bubble1.className = "bubble";
@@ -146,24 +149,30 @@ Module.register("MMM-TankLevel",{
 		bubble5.style.left = "60%";
 		bubble5.style.animationDelay = "1.5s";
 
-		tankBody.appendChild(gasLevel);
-		gasLevel.appendChild(gasLevelText);
-		gasLevel.appendChild(bubble1);
-		gasLevel.appendChild(bubble2);
-		gasLevel.appendChild(bubble3);
-		gasLevel.appendChild(bubble4);
-		gasLevel.appendChild(bubble5);
+		tankBody.appendChild(TankLevel);
+		TankLevel.appendChild(TankLevelText);
+		TankLevel.appendChild(bubble1);
+		TankLevel.appendChild(bubble2);
+		TankLevel.appendChild(bubble3);
+		TankLevel.appendChild(bubble4);
+		TankLevel.appendChild(bubble5);
 
 		let tankBottom = document.createElement("div");
-		tankContainer.className = "tank-bottom";
+		tankBottom.className = "tank-bottom";
 
 		tankContainer.appendChild(tankTop);
 		tankContainer.appendChild(tankBody);
 		tankContainer.appendChild(tankBottom);
 
+		let tankElement = document.createElement("div");
+		tankElement.style.justifyContent = "center";
+		tankElement.style.display = "flex";
+		tankElement.style.alignItems = "center";
+		tankElement.appendChild(tankContainer);
+
 		container.appendChild(headerDiv);
 		container.appendChild(divider);
-		container.appendChild(tankContainer);
+		container.appendChild(tankElement);
 
 		return container;
 	},

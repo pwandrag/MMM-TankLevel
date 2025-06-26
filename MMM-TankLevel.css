@@ -1,15 +1,12 @@
 /*
  *
- * MMM-SolarMan
+ * MMM-TankLevel
  *
  * Author: pwandrag
  * MIT Licensed.
  *
  */
-  :root {
-			--fill-level: 50%;
-			--fill-level-surge: 40%
-		}
+
  
   .tank {
     width: 100px;
@@ -18,7 +15,7 @@
     border-radius: 10px;
     position: relative;
     overflow: hidden;
-    background-color: #ccc;
+    background-color: #999;
   }
 		
   .tank-top {
@@ -49,9 +46,11 @@
     }
 		
 		
-  .tank-container{
+  .tank-container {
     height:220px;
-    width:100px
+    width:100px;
+		--fill-level: 50%;
+		--fill-level-surge: 40%  
   }
 
   .gas {

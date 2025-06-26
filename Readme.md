@@ -1,4 +1,4 @@
-## MagicMirror Module: GasLevel
+## MagicMirror Module: TankLevel
 
 Display Gas Level
 
@@ -8,7 +8,7 @@ Display Gas Level
 
 #### What is this module doing?
 
-*MMM-GasLevel* is a [MagicMirror](https://github.com/MichMich/MagicMirror) module for displaying the 
+*MMM-TankLevel* is a [MagicMirror](https://github.com/MichMich/MagicMirror) module for displaying the 
 gas level calculated based on a burn % rate per day, and a fill date 
 
 ### Example Screenshots
@@ -23,24 +23,24 @@ Manual Installation:
 
 ```bash
 cd ~/MagicMirror/modules
-git clone https://github.com/pwandrag/MMM-GasLevel.git
-cd MMM-GasLevel
+git clone https://github.com/pwandrag/MMM-TankLevel.git
+cd MMM-TankLevel
 ```
 
 ### Configuration 
 
-To configure the GasLevel module, you need to do the following:
+To configure the TankLevel module, you need to do the following:
 
 1. Add the Module to the global MagicMirror `config.js` 
 2. Edit the global config to add the burn rate and fill date
-3. [optional] Modify `MMM-GasLevel.css` to your own CSS taste
+3. [optional] Modify `MMM-TankLevel.css` to your own CSS taste
 
 
 Add this module to the modules array in the `config/config.js` file by adding the following example section.<br>You must include your SolarMan stationID and token, you can edit the config to include any of the configuration options described below. 
 
 ```javascript
 {
-    module: 'MMM-GasLevel',
+    module: 'MMM-TankLevel',
     position: 'bottom_left',
     header: 'Gas Level',
     config: {
@@ -69,10 +69,7 @@ Add this module to the modules array in the `config/config.js` file by adding th
 Feel free to post issues or remarks related to this module.  
 For all other or general questions, please refer to the [MagicMirror Forum](https://forum.magicmirror.builders/).
 
-#### Credits
-I based the code on linuxtuxie's [MMM-GasLevel](https://github.com/linuxtuxie/MMM-SunnyPortal)
-
 #### License 
 
-[MIT License](https://github.com/linuxtuxie/MMM-GasLevel/blob/main/LICENSE) 
+[MIT License](https://github.com/linuxtuxie/MMM-TankLevel/blob/main/LICENSE) 
 
