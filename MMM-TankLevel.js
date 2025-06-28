@@ -15,7 +15,7 @@ Module.register("MMM-TankLevel",{
 		width: 500,
 		height: 400,
 		burnRate: 5.2, // Burn rate in kg/day	  
-		fillDate : '2025-05-21T00:00:00Z', // Date when the tank was last filled
+		fillDate : new Date(), // Date when the tank was last filled
 	},
 
   
@@ -37,7 +37,7 @@ Module.register("MMM-TankLevel",{
 
 	  this.payload = false;
 	  refresh = (this.config.updateIntervalSeconds) * 1000;
-	  this.sendSocketNotification("START_TANKLEVEL", {
+	  this.sendSocketNotification("TANKLEVEL_START", {
 		updateInterval: refresh,
 		burnRate: this.config.burnRate,
 		fillDate: this.config.fillDate,
@@ -56,7 +56,7 @@ Module.register("MMM-TankLevel",{
 	  
 		let TankLevel = payload.TankLevel; // Get the gas level from the payload
 		let daysRemaining = payload.daysRemaining;
-		let TankLevelSurge = TankLevel-10;
+		let TankLevelSurge = TankLevel-3;
 
 		let container = document.getElementById("TankLevelContainer")
 
@@ -73,8 +73,16 @@ Module.register("MMM-TankLevel",{
 		let gasTop = container.querySelector(".tank-top");
 		gasTop.innerHTML = `${daysRemaining}d`;
 
+		var gasColour = 'rgba(0, 255, 0, 0.473)';
+		if (TankLevel < 20) {
+			gasColour = 'rgba(255, 0, 0, 0.473)'; // Change color to red if below 20%
+		} else if (TankLevel < 50) {
+			gasColour = 'rgba(255, 255, 0, 0.473)'; // Change color to yellow if below 50%
+
 		}
+		TankLevelElement.style.backgroundColor = gasColour; // Update the background color of the gas level
 		return;
+	}
 	},
   
 	// Override dom generator.
@@ -142,12 +150,12 @@ Module.register("MMM-TankLevel",{
 		bubble4.style.left = "30%";
 		bubble4.style.animationDelay = "2s";
 
-		let bubble5 = document.createElement("div");
-		bubble5.className = "bubble";
-		bubble5.style.width = "18px";
-		bubble5.style.height = "18px";
-		bubble5.style.left = "60%";
-		bubble5.style.animationDelay = "1.5s";
+		//let bubble5 = document.createElement("div");
+		//bubble5.className = "bubble";
+		//bubble5.style.width = "18px";
+		//bubble5.style.height = "18px";
+		//bubble5.style.left = "60%";
+		//bubble5.style.animationDelay = "1.5s";
 
 		tankBody.appendChild(TankLevel);
 		TankLevel.appendChild(TankLevelText);
@@ -155,7 +163,7 @@ Module.register("MMM-TankLevel",{
 		TankLevel.appendChild(bubble2);
 		TankLevel.appendChild(bubble3);
 		TankLevel.appendChild(bubble4);
-		TankLevel.appendChild(bubble5);
+		//TankLevel.appendChild(bubble5);
 
 		let tankBottom = document.createElement("div");
 		tankBottom.className = "tank-bottom";
@@ -165,9 +173,7 @@ Module.register("MMM-TankLevel",{
 		tankContainer.appendChild(tankBottom);
 
 		let tankElement = document.createElement("div");
-		tankElement.style.justifyContent = "center";
-		tankElement.style.display = "flex";
-		tankElement.style.alignItems = "center";
+		tankElement.className = "tank-element";
 		tankElement.appendChild(tankContainer);
 
 		container.appendChild(headerDiv);

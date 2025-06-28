@@ -21,15 +21,20 @@ module.exports = NodeHelper.create({
 	socketNotificationReceived: async function(notification, payload) {
 		var self = this;
 		console.log("MMM-TankLevel: "+notification);
-		console.info("MMM-TankLevel: "+JSON.stringify(payload));
-		self.processData(payload); // When the MagicMirror module is called the first time, we are immediatly going to fetch data
-		//setInterval( async function() { await self.processData(payload) }, 14400000); // update every 4 hours
-		self.started = true;
+		if (!self.started)
+		{
+			setInterval( async function() { await self.processData(payload) }, payload.updateInterval); // update every 4 hours
+			self.started = true;
+			self.processData(payload); // When the MagicMirror module is called the first time, we are immediatly going to fetch data
+		}else {
+			console.log("MMM-TankLevel: Already started, not starting again");
+		}
 		return;
 	},
 
 	processData: async function(payload) {
 		var self = this;
+		//console.info("MMM-TankLevel: "+JSON.stringify(payload));
 
 		let rate = payload.burnRate; //rate in %/day
 		let fillDate = new Date(payload.fillDate);
