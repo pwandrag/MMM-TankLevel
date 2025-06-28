@@ -59,8 +59,8 @@
     height: 90%;
     position: relative;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: left;
+    align-items: left;
   }  
 
   .tank-container {
