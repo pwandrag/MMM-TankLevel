@@ -7,10 +7,13 @@
  *
  */
 
- .MMM-TankLevel {
-  display: block;
+  .MMM-TankLevel {
+    display: block;
+  }
 
- }
+  .module-header {
+    display: inline-flex;
+  }
 
   .tank {
     width: 100%;

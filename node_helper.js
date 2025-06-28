@@ -23,21 +23,26 @@ module.exports = NodeHelper.create({
 		console.log("MMM-TankLevel: "+notification);
 		if (!self.started)
 		{
-			setInterval( async function() { await self.processData(payload) }, payload.updateInterval); // update every 4 hours
+			setInterval( async function() { await self.processData() }, payload.updateInterval); // update every 4 hours
 			self.started = true;
-			self.processData(payload); // When the MagicMirror module is called the first time, we are immediatly going to fetch data
+			this.config = payload; // Store the configuration for later use
+			self.processData(); // When the MagicMirror module is called the first time, we are immediatly going to fetch data
 		}else {
-			console.log("MMM-TankLevel: Already started, not starting again");
+			//update fillDate
+			if (notification === "TANKLEVEL_UPDATE") {
+				console.log("MMM-TankLevel: Updating fill date to " + payload.fillDate);
+				this.config.fillDate = payload.fillDate; // Update the fill date in the config
+			}
 		}
 		return;
 	},
 
-	processData: async function(payload) {
+	processData: async function() {
 		var self = this;
-		//console.info("MMM-TankLevel: "+JSON.stringify(payload));
+		console.info("MMM-TankLevel: "+JSON.stringify(self.config));
 
-		let rate = payload.burnRate; //rate in %/day
-		let fillDate = new Date(payload.fillDate);
+		let rate = self.config.burnRate; //rate in %/day
+		let fillDate = new Date(self.config.fillDate);
 		let now = new Date();
 		let daysSinceFillRate = Math.floor((now - fillDate) / (1000 * 60 * 60 * 24)); // Calculate days since last fill
 		let TankLevel = 100 - (daysSinceFillRate * rate); // Calculate gas level in %

@@ -5,6 +5,7 @@ Display Gas Level
 | Status | Version | Date | 
 |:------- |:------- |:---- |
 | Initial | 1.0.0 | 2025-06-23 |
+| Latest  | 1.1.0 | 2025-06-28 |
 
 #### What is this module doing?
 
@@ -48,6 +49,9 @@ Add this module to the modules array in the `config/config.js` file by adding th
         height: 400,
         burnRate: 5.7,
         fillDate: 2025-06-23
+        linkCalendarEvents: true, //
+        calendarName: "family", //name of calendar to listen to 
+        refillEventName: "Gas Refill", //name of event to look for. Uses the last occurence of this event name to derrive date
     }
 },
 ```
@@ -62,6 +66,9 @@ Add this module to the modules array in the `config/config.js` file by adding th
 | height            | The height of the module.<br>*Optional*<br>*Default value:* `400` |
 | burnRate          | Gas usage % per day |
 | fillDate          | Date last filled |
+| linkCalendarEvents| Set to true to listen to calendar events for refill dates <br>*Optional*<br>*Default value: `false`* |
+| calendarName      | Name of calendar to listen to <br>*Optional* |
+| refillEventName   | Name of event to look for. Uses the last occurence of this event name to derrive date <br>*Optional* |
 
 
 #### Contribution

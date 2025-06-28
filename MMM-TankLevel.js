@@ -16,6 +16,9 @@ Module.register("MMM-TankLevel",{
 		height: 400,
 		burnRate: 5.2, // Burn rate in kg/day	  
 		fillDate : new Date(), // Date when the tank was last filled
+		refillEventName: 'Gas Refill', // Name of the calendar event for refill`
+		calendarName: 'family', // Name of the calendar to listen for refill events
+		linkCalendarEvents: false, // Set to true to link calendar events for refill
 	},
 
   
@@ -41,7 +44,51 @@ Module.register("MMM-TankLevel",{
 		updateInterval: refresh,
 		burnRate: this.config.burnRate,
 		fillDate: this.config.fillDate,
+		refillEventName: this.config.refillEventName,
+		calendarName: this.config.calendarName,
 	  });
+	},
+
+	notificationReceived: function(notification, payload, sender) {
+
+	if (!this.config.linkCalendarEvents) {
+		console.log("MMM-TankLevel: No calendar name configured, skipping calendar events");
+		return;
+	}
+
+	// Listen to calendar events
+	if (notification == "CALENDAR_EVENTS") {
+		console.log("MMM-TankLevel: Received calendar events");
+		console.log("MMM-TankLevel: Sender name: " + sender.name);
+
+		//filter all payload entries for calendarName='family'
+	  	if (payload && payload.length > 0) {
+
+			payload = payload.filter(event => event.calendarName === this.config.calendarName);
+			if (payload.length === 0) {
+				console.log("MMM-TankLevel: No family calendar events found");
+				return;
+			}
+			// Extract the last event's start date where title='Fill Date'
+			let fillDateEvent = payload.findLast(event => event.title === this.config.refillEventName);
+			if (fillDateEvent) {
+				let fillDate = new Date(0);
+				fillDate.setUTCSeconds(fillDateEvent.startDate/1000); // Convert milliseconds to seconds
+				if (fillDate) {
+					this.config.fillDate = fillDate; // Update the fill date in the config
+					console.log("MMM-TankLevel: Fill date updated to " + this.config.fillDate);
+					this.sendSocketNotification("TANKLEVEL_UPDATE", {
+						updateInterval: refresh,
+						burnRate: this.config.burnRate,
+						fillDate: this.config.fillDate,
+					});
+				} else {
+					console.log("MMM-TankLevel: No valid fill date found in calendar events");
+				}
+			}
+		}
+	  }
+	
 	},
 
 	socketNotificationReceived: function(notification, payload) {
