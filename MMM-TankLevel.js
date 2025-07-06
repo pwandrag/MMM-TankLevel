@@ -120,11 +120,11 @@ Module.register("MMM-TankLevel",{
 		let gasTop = container.querySelector(".tank-top");
 		gasTop.innerHTML = `${daysRemaining}d`;
 
-		var gasColour = 'rgba(0, 255, 0, 0.473)';
+		var gasColour = 'linear-gradient(180deg,rgba(0, 255, 55, 0) 0%, rgba(0, 255, 55, 0.35) 25%, rgba(0, 255, 55, 1) 100%);';
 		if (TankLevel < 20) {
-			gasColour = 'rgba(255, 0, 0, 0.473)'; // Change color to red if below 20%
+			gasColour = 'linear-gradient(180deg,rgba(255,0, 0, 0) 0%, rgba(255, 0, 0, 0.35) 25%, rgba(255, 0, 0, 1) 100%);'; // Change color to red if below 20%
 		} else if (TankLevel < 50) {
-			gasColour = 'rgba(255, 255, 0, 0.473)'; // Change color to yellow if below 50%
+			gasColour = 'linear-gradient(180deg,rgba(255,255, 0, 0) 0%, rgba(255, 255, 0, 0.35) 25%, rgba(255, 255, 0, 1) 100%);'; // Change color to yellow if below 50%
 
 		}
 		TankLevelElement.style.backgroundColor = gasColour; // Update the background color of the gas level

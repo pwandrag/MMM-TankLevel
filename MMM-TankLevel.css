@@ -75,7 +75,8 @@
   .gas {
       width: 100%;
       height: var(--fill-level); /* 75% filled */
-      background-color: rgba(0, 255, 0, 0.473); /* Green gas */
+      background-color: rgba(0, 0, 0, 0.473); /* Green gas */
+      background: linear-gradient(180deg,rgba(0, 255, 55, 0) 0%, rgba(0, 255, 55, 0.35) 25%, rgba(0, 255, 55, 1) 100%);
       position: absolute;
       bottom: 0;
       animation: rise 20s infinite;
@@ -94,7 +95,7 @@
       background-color: white;
       border-radius: 50%;
       opacity: 0.7;
-      animation: float 3s infinite;
+      animation: float 10s infinite;
   }
  
   @keyframes float {
