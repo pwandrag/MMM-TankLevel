@@ -23,6 +23,8 @@
     position: relative;
     overflow: hidden;
     background-color: #3f3e3e;
+    border-top-left-radius: 35px;
+    border-top-right-radius: 35px;
   }
 		
   .tank-top {
