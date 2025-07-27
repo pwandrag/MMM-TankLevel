@@ -10,12 +10,12 @@ Display Gas Level
 #### What is this module doing?
 
 *MMM-TankLevel* is a [MagicMirror](https://github.com/MichMich/MagicMirror) module for displaying the 
-gas level calculated based on a burn % rate per day, and a fill date 
+gas level calculated based on a burn % rate per day, and a fill date. The module listens to the calendar module for entries named 'Gas Refill', which auto-resets the tank to 100%
 
 ### Example Screenshots
 
 Module Screenshot:
-
+![Tank Level screenshot](screenshot.png?raw=true "Tank Level")
 ---
 
 ### Installation
