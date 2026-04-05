@@ -115,6 +115,33 @@
       }
   }
 
+  .season-badge {
+    font-family: monospace;
+    font-size: 13px;
+    text-align: center;
+    margin-top: 6px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    display: inline-block;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .season-summer {
+    color: #f5c842;
+    border: 1px solid #f5c84260;
+  }
+
+  .season-winter {
+    color: #80c8ff;
+    border: 1px solid #80c8ff60;
+  }
+
+  .season-overall {
+    color: #888;
+    border: 1px solid #88888840;
+  }
+
   @keyframes rise {
       0% {
           height: var(--fill-level);

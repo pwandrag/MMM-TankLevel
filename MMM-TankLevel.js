@@ -42,6 +42,7 @@ Module.register("MMM-TankLevel",{
 	  console.log("Starting module: " + this.name);
 
 	  this.payload = false;
+	  this.seasonInfo = null;
 	  refresh = (this.config.updateIntervalSeconds) * 1000;
 	  this.sendSocketNotification("TANKLEVEL_START", {
 		updateInterval: refresh,
@@ -145,6 +146,12 @@ Module.register("MMM-TankLevel",{
 				console.log("MMM-TankLevel: Not enough refill history, using fallback burnRate config");
 			}
 
+			this.seasonInfo = {
+				label: seasonLabel,
+				count: selectedIntervals.length,
+				usingFallback: computedBurnRate === null,
+			};
+
 			this.sendSocketNotification("TANKLEVEL_UPDATE", {
 				updateInterval: refresh,
 				burnRate: computedBurnRate !== null ? computedBurnRate : this.config.burnRate,
@@ -191,6 +198,24 @@ Module.register("MMM-TankLevel",{
 			gasColour = 'linear-gradient(180deg,rgba(255,255, 0, 0) 0%, rgba(255, 255, 0, 0.35) 25%, rgba(255, 255, 0, 1) 100%)'; // Change color to yellow if below 50%
 		}
 		TankLevelElement.style.background = gasColour; // Update the background color of the gas level
+
+		let seasonBadge = container.querySelector(".season-badge");
+		if (this.seasonInfo) {
+			let label = this.seasonInfo.label;
+			let isSummer = label === "summer";
+			let isWinter = label === "winter";
+			let iconClass = isSummer ? "fas fa-fw fa-sun"
+				: isWinter  ? "fas fa-fw fa-snowflake"
+				:              "fas fa-fw fa-chart-bar";
+			let badgeClass = isSummer ? "season-summer"
+				: isWinter  ? "season-winter"
+				:              "season-overall";
+			let periodText = this.seasonInfo.usingFallback
+				? "fallback rate"
+				: `${this.seasonInfo.count} period${this.seasonInfo.count !== 1 ? "s" : ""}`;
+			seasonBadge.className = `season-badge ${badgeClass}`;
+			seasonBadge.innerHTML = `<i class="${iconClass}"></i> ${label} &middot; ${periodText}`;
+		}
 		return;
 	}
 	},
@@ -286,9 +311,13 @@ Module.register("MMM-TankLevel",{
 		tankElement.className = "tank-element";
 		tankElement.appendChild(tankContainer);
 
+		let seasonBadge = document.createElement("div");
+		seasonBadge.className = "season-badge season-overall";
+
 		container.appendChild(headerDiv);
 		container.appendChild(divider);
 		container.appendChild(tankElement);
+		container.appendChild(seasonBadge);
 
 		return container;
 	},
