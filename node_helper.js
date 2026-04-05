@@ -35,6 +35,7 @@ module.exports = NodeHelper.create({
 				if (payload.burnRate !== undefined) {
 					this.config.burnRate = payload.burnRate; // Use seasonal computed rate if available
 				}
+				await self.processData();
 			}
 		}
 		return;
