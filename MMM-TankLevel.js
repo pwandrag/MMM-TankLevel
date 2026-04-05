@@ -78,7 +78,7 @@ Module.register("MMM-TankLevel",{
 			cutoffDate.setMonth(cutoffDate.getMonth() - this.config.lookBackMonths);
 
 			let refillDates = payload
-				.filter(event => event.title === this.config.refillEventName)
+				.filter(event => event.title.toLowerCase() === this.config.refillEventName.toLowerCase())
 				.map(event => {
 					let d = new Date(0);
 					d.setUTCSeconds(event.startDate / 1000);
@@ -98,12 +98,12 @@ Module.register("MMM-TankLevel",{
 			console.log("MMM-TankLevel: Fill date updated to " + this.config.fillDate);
 
 			// Parse season month lists (1-12)
-			let summerMonths = this.config.summerMonths
-				? this.config.summerMonths.split(",").map(m => parseInt(m.trim())).filter(m => !isNaN(m))
-				: [];
-			let winterMonths = this.config.winterMonths
-				? this.config.winterMonths.split(",").map(m => parseInt(m.trim())).filter(m => !isNaN(m))
-				: [];
+			let summerMonths = Array.isArray(this.config.summerMonths)
+				? this.config.summerMonths
+				: (this.config.summerMonths ? this.config.summerMonths.split(",").map(m => parseInt(m.trim())).filter(m => !isNaN(m)) : []);
+			let winterMonths = Array.isArray(this.config.winterMonths)
+				? this.config.winterMonths
+				: (this.config.winterMonths ? this.config.winterMonths.split(",").map(m => parseInt(m.trim())).filter(m => !isNaN(m)) : []);
 			let currentMonth = new Date().getMonth() + 1; // 1-12
 
 			// Classify each consecutive interval by the season of its start date
