@@ -10,15 +10,18 @@
 
 Module.register("MMM-TankLevel",{
 	// Default module config.
-	defaults: {	  
+	defaults: {
 		updateIntervalSeconds: 120, // Update interval in seconds
 		width: 500,
 		height: 400,
-		burnRate: 5.2, // Burn rate in kg/day	  
+		burnRate: 5.2, // Fallback burn rate in %/day (used when not enough refill history)
 		fillDate : new Date(), // Date when the tank was last filled
 		refillEventName: 'Gas Refill', // Name of the calendar event for refill`
 		calendarName: 'family', // Name of the calendar to listen for refill events
 		linkCalendarEvents: false, // Set to true to link calendar events for refill
+		lookBackMonths: 12, // Number of months to look back for seasonal burn rate calculation
+		summerMonths: "6,7,8,9",   // Comma-separated month numbers considered summer (1=Jan)
+		winterMonths: "12,1,2,3",  // Comma-separated month numbers considered winter (1=Jan)
 	},
 
   
@@ -69,23 +72,84 @@ Module.register("MMM-TankLevel",{
 				console.log("MMM-TankLevel: No family calendar events found");
 				return;
 			}
-			// Extract the last event's start date where title='Fill Date'
-			let fillDateEvent = payload.findLast(event => event.title === this.config.refillEventName);
-			if (fillDateEvent) {
-				let fillDate = new Date(0);
-				fillDate.setUTCSeconds(fillDateEvent.startDate/1000); // Convert milliseconds to seconds
-				if (fillDate) {
-					this.config.fillDate = fillDate; // Update the fill date in the config
-					console.log("MMM-TankLevel: Fill date updated to " + this.config.fillDate);
-					this.sendSocketNotification("TANKLEVEL_UPDATE", {
-						updateInterval: refresh,
-						burnRate: this.config.burnRate,
-						fillDate: this.config.fillDate,
-					});
-				} else {
-					console.log("MMM-TankLevel: No valid fill date found in calendar events");
+			// Collect all refill events within the lookback window and sort ascending
+			let cutoffDate = new Date();
+			cutoffDate.setMonth(cutoffDate.getMonth() - this.config.lookBackMonths);
+
+			let refillDates = payload
+				.filter(event => event.title === this.config.refillEventName)
+				.map(event => {
+					let d = new Date(0);
+					d.setUTCSeconds(event.startDate / 1000);
+					return d;
+				})
+				.filter(d => d >= cutoffDate)
+				.sort((a, b) => a - b);
+
+			if (refillDates.length === 0) {
+				console.log("MMM-TankLevel: No refill events found within lookback window");
+				return;
+			}
+
+			// Most recent refill is the current fill date
+			let fillDate = refillDates[refillDates.length - 1];
+			this.config.fillDate = fillDate;
+			console.log("MMM-TankLevel: Fill date updated to " + this.config.fillDate);
+
+			// Parse season month lists (1-12)
+			let summerMonths = this.config.summerMonths
+				? this.config.summerMonths.split(",").map(m => parseInt(m.trim())).filter(m => !isNaN(m))
+				: [];
+			let winterMonths = this.config.winterMonths
+				? this.config.winterMonths.split(",").map(m => parseInt(m.trim())).filter(m => !isNaN(m))
+				: [];
+			let currentMonth = new Date().getMonth() + 1; // 1-12
+
+			// Classify each consecutive interval by the season of its start date
+			let summerIntervals = [];
+			let winterIntervals = [];
+			let allIntervals = [];
+
+			for (let i = 1; i < refillDates.length; i++) {
+				let days = (refillDates[i] - refillDates[i - 1]) / (1000 * 60 * 60 * 24);
+				let startMonth = refillDates[i - 1].getMonth() + 1;
+				allIntervals.push(days);
+				if (summerMonths.includes(startMonth)) {
+					summerIntervals.push(days);
+				} else if (winterMonths.includes(startMonth)) {
+					winterIntervals.push(days);
 				}
 			}
+
+			// Select interval pool based on current season; fall back to all intervals, then config
+			let seasonLabel, selectedIntervals;
+			if (summerMonths.includes(currentMonth) && summerIntervals.length > 0) {
+				seasonLabel = "summer";
+				selectedIntervals = summerIntervals;
+			} else if (winterMonths.includes(currentMonth) && winterIntervals.length > 0) {
+				seasonLabel = "winter";
+				selectedIntervals = winterIntervals;
+			} else {
+				seasonLabel = summerMonths.includes(currentMonth) || winterMonths.includes(currentMonth)
+					? "overall (no seasonal data yet)"
+					: "overall";
+				selectedIntervals = allIntervals;
+			}
+
+			let computedBurnRate = null;
+			if (selectedIntervals.length >= 1) {
+				let avgDays = selectedIntervals.reduce((a, b) => a + b, 0) / selectedIntervals.length;
+				computedBurnRate = 100 / avgDays;
+				console.log(`MMM-TankLevel: ${seasonLabel} burn rate: ${computedBurnRate.toFixed(4)} %/day (avg interval: ${avgDays.toFixed(1)} days, ${selectedIntervals.length} sample(s))`);
+			} else {
+				console.log("MMM-TankLevel: Not enough refill history, using fallback burnRate config");
+			}
+
+			this.sendSocketNotification("TANKLEVEL_UPDATE", {
+				updateInterval: refresh,
+				burnRate: computedBurnRate !== null ? computedBurnRate : this.config.burnRate,
+				fillDate: this.config.fillDate,
+			});
 		}
 	  }
 	
@@ -120,14 +184,13 @@ Module.register("MMM-TankLevel",{
 		let gasTop = container.querySelector(".tank-top");
 		gasTop.innerHTML = `${daysRemaining}d`;
 
-		var gasColour = 'linear-gradient(180deg,rgba(0, 255, 55, 0) 0%, rgba(0, 255, 55, 0.35) 25%, rgba(0, 255, 55, 1) 100%);';
+		var gasColour = 'linear-gradient(180deg,rgba(0, 255, 55, 0) 0%, rgba(0, 255, 55, 0.35) 25%, rgba(0, 255, 55, 1) 100%)';
 		if (TankLevel < 20) {
-			gasColour = 'linear-gradient(180deg,rgba(255,0, 0, 0) 0%, rgba(255, 0, 0, 0.35) 25%, rgba(255, 0, 0, 1) 100%);'; // Change color to red if below 20%
+			gasColour = 'linear-gradient(180deg,rgba(255,0, 0, 0) 0%, rgba(255, 0, 0, 0.35) 25%, rgba(255, 0, 0, 1) 100%)'; // Change color to red if below 20%
 		} else if (TankLevel < 50) {
-			gasColour = 'linear-gradient(180deg,rgba(255,255, 0, 0) 0%, rgba(255, 255, 0, 0.35) 25%, rgba(255, 255, 0, 1) 100%);'; // Change color to yellow if below 50%
-
+			gasColour = 'linear-gradient(180deg,rgba(255,255, 0, 0) 0%, rgba(255, 255, 0, 0.35) 25%, rgba(255, 255, 0, 1) 100%)'; // Change color to yellow if below 50%
 		}
-		TankLevelElement.style.backgroundColor = gasColour; // Update the background color of the gas level
+		TankLevelElement.style.background = gasColour; // Update the background color of the gas level
 		return;
 	}
 	},

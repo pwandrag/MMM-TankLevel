@@ -28,10 +28,13 @@ module.exports = NodeHelper.create({
 			this.config = payload; // Store the configuration for later use
 			self.processData(); // When the MagicMirror module is called the first time, we are immediatly going to fetch data
 		}else {
-			//update fillDate
+			//update fillDate and optionally burnRate
 			if (notification === "TANKLEVEL_UPDATE") {
 				console.log("MMM-TankLevel: Updating fill date to " + payload.fillDate);
-				this.config.fillDate = payload.fillDate; // Update the fill date in the config
+				this.config.fillDate = payload.fillDate;
+				if (payload.burnRate !== undefined) {
+					this.config.burnRate = payload.burnRate; // Use seasonal computed rate if available
+				}
 			}
 		}
 		return;
